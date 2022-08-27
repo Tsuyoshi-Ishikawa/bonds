@@ -8,6 +8,28 @@ FEE=$(bondscli keys show fee --keyring-backend=test -a)
 # https://www.desmos.com/calculator/2ael5dojku
 
 # Create a Power Function bonding curve
+# token: 発行するトークンの単位
+# function-type: bonding curveのfunction
+# function-parameters: functionに必要な引数をセット
+# max-supply: 発行するトークンの上限
+# reserve-tokens: どんなtokenを受け取って、今回のトークン(mytoken)を発行するか
+# tx-fee-percentage: 購入・売却どちらかに関係なく、取引自体があった場合に発生するfee
+# exit-fee-percentage: 売却時にのみ発生するfee
+# fee-address: 手数料が送られるアドレス(dapps運営元)
+# 上記で設定しているfeeはgas代とは別。
+# https://docs.ixo.foundation/alphabond/tutorials/01_standard#mint-to-deposit
+
+# order-quantity-limits: 一度の取引でやり取りできるトークン量の上限
+# batch-blocks: batch-blocksごとにこのトークン売買が処理される。これはフロントランニングを防ぐためのもの。
+# バッチ処理を行い、一つのバッチ処理で、全ての書い手・売り手に別々の値段を提示するのではなく、統一の値段を提供する
+# https://billyrennekamp.medium.com/batched-bonding-curves-ce69a57d8ae4
+
+# sanity-rate、sanity-margin-percentage: function-typeでswapper関数を設定したときに必要になる
+# allow-sells: 売りを有効にするか
+# signers: 売りに足して誰が署名をするのか
+# from: 売られたら誰からtokenが送られてくるかと思われる
+# https://docs.ixo.foundation/alphabond/spec/07_functions_library
+# https://docs.ixo.foundation/alphabond/tutorials/01_standard
 bondscli tx bonds create-bond \
   --token=mytoken \
   --name="My Token" \
@@ -37,6 +59,8 @@ bondscli q bonds buy-price 10mytoken
 bondscli q bonds price 10mytoken
 
 # Buy 10mytoken from alice with max spend of 1000000uatom
+# 最大消費額(1000000uatom)は実際の買い価格(bondscli q bonds buy-price 10mytoken)よりも多めに設定する
+# https://docs.ixo.foundation/alphabond/tutorials/01_standard#mint-to-deposit
 bondscli tx bonds buy 10mytoken 1000000uatom --from alice --keyring-backend=test --broadcast-mode block -y
 # Wait for order to get processed
 sleep 21
